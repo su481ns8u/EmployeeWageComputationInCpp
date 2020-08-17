@@ -5,6 +5,8 @@ using namespace std;
 int FULL_DAY_HRS = 8;
 int PART_TIME_HRS = 4;
 int WAGE_PER_HR = 20;
+int DAYS_IN_MONTH = 20;
+int HRS_PER_MONTH = 100;
 int computeWage();
 
 int main(int argc, char const *argv[])
@@ -17,7 +19,7 @@ int main(int argc, char const *argv[])
 int computeWage()
 {
     int workHrs = 0;
-    for (int day = 0; day < 20; day++)
+    for (int day = 0; day < DAYS_IN_MONTH && workHrs < HRS_PER_MONTH; day++)
     {
         int result = rand() % 3;
         switch (result)
