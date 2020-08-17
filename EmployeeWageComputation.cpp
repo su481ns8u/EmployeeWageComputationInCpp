@@ -2,19 +2,31 @@
 #include <time.h>
 
 using namespace std;
-bool isPresent();
+int FULL_DAY_HRS = 8;
+int PART_TIME_HRS = 4;
+int WAGE_PER_HR = 20;
+int computeWage();
 
 int main(int argc, char const *argv[])
 {
-    cout << "Presenty status: " << isPresent();
+    srand(time(0));
+    cout << "Employee Wage: " << computeWage() << endl;
     return 0;
 }
 
-bool isPresent()
+int computeWage()
 {
-    srand(time(0));
-    int result = rand() % 2;
-    if (result == 1)
-        return true;
-    return false;
+    int result = rand() % 3;
+    switch (result)
+    {
+    case 1:
+        return FULL_DAY_HRS * WAGE_PER_HR;
+        break;
+    case 2:
+        return PART_TIME_HRS * WAGE_PER_HR;
+        break;
+    default:
+        return 0;
+        break;
+    }
 }
