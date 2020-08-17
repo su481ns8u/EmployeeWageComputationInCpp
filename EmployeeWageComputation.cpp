@@ -10,23 +10,28 @@ int computeWage();
 int main(int argc, char const *argv[])
 {
     srand(time(0));
-    cout << "Employee Wage: " << computeWage() << endl;
+    cout << "Employee Wage for a month is: " << computeWage() << endl;
     return 0;
 }
 
 int computeWage()
 {
-    int result = rand() % 3;
-    switch (result)
+    int workHrs = 0;
+    for (int day = 0; day < 20; day++)
     {
-    case 1:
-        return FULL_DAY_HRS * WAGE_PER_HR;
-        break;
-    case 2:
-        return PART_TIME_HRS * WAGE_PER_HR;
-        break;
-    default:
-        return 0;
-        break;
+        int result = rand() % 3;
+        switch (result)
+        {
+        case 1:
+            workHrs += FULL_DAY_HRS;
+            break;
+        case 2:
+            workHrs += PART_TIME_HRS;
+            break;
+        default:
+            workHrs += 0;
+            break;
+        }
     }
+    return workHrs * WAGE_PER_HR;
 }
