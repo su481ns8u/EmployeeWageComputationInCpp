@@ -8,38 +8,43 @@ int PART_TIME_HRS = 4;
 int WAGE_PER_HR = 20;
 int DAYS_IN_MONTH = 20;
 int HRS_PER_MONTH = 100;
-int computeWage();
+void computeWage(int noOfEmp);
 void writeToFile(string data);
 
 int main(int argc, char const *argv[])
 {
+    int noOfEmp;
+    cout << "Enter number of employees: ";
+    cin >> noOfEmp;
     srand(time(0));
-    cout << "Employee Wage for a month is: " << computeWage() << endl;
+    computeWage(noOfEmp);
     return 0;
 }
 
-int computeWage()
+void computeWage(int noOfEmp)
 {
-    int workHrs = 0;
-    for (int day = 0; day < DAYS_IN_MONTH && workHrs < HRS_PER_MONTH; day++)
+    for (int empNo = 1; empNo <= noOfEmp; empNo++)
     {
-        int result = rand() % 3;
-        switch (result)
+        int workHrs = 0;
+        for (int day = 0; day < DAYS_IN_MONTH && workHrs < HRS_PER_MONTH; day++)
         {
-        case 1:
-            workHrs += FULL_DAY_HRS;
-            break;
-        case 2:
-            workHrs += PART_TIME_HRS;
-            break;
-        default:
-            workHrs += 0;
-            break;
+            int result = rand() % 3;
+            switch (result)
+            {
+            case 1:
+                workHrs += FULL_DAY_HRS;
+                break;
+            case 2:
+                workHrs += PART_TIME_HRS;
+                break;
+            default:
+                workHrs += 0;
+                break;
+            }
         }
+        int totalWage = workHrs * WAGE_PER_HR;
+        writeToFile(to_string(empNo) + ", " + to_string(totalWage));
     }
-    int totalWage = workHrs * WAGE_PER_HR;
-    writeToFile("Wage: " + to_string(totalWage));
-    return totalWage;
 }
 
 void writeToFile(string data)
