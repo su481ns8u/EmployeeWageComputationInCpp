@@ -3,34 +3,55 @@
 #include <fstream>
 
 using namespace std;
-int FULL_DAY_HRS = 8;
-int PART_TIME_HRS = 4;
-int WAGE_PER_HR = 20;
-int DAYS_IN_MONTH = 20;
-int HRS_PER_MONTH = 100;
-void computeWage(int noOfEmp, int noOfMonths);
+
+typedef struct Company;
+void computeWage(int noOfEmp, int noOfMonths, Company company);
 void writeToFile(string data);
+
+const int FULL_DAY_HRS = 8;
+const int PART_TIME_HRS = 4;
+
+typedef struct Company
+{
+    string name;
+    int wagePerHr;
+    int workDaysPerMonth;
+    int workHrsPerMonth;
+};
 
 int main(int argc, char const *argv[])
 {
     int noOfEmp, noOfMonths;
+    Company company;
+
+    cout << "Enter name of company";
+    cin >> company.name;
+    cout << "Enter wage per hr for " << company.name << ": ";
+    cin >> company.wagePerHr;
+    cout << "Enter work days for " << company.name << ": ";
+    cin >> company.workDaysPerMonth;
+    cout << "Enter work hrs for " << company.name << ": ";
+    cin >> company.workHrsPerMonth;
     cout << "Enter number of employees: ";
     cin >> noOfEmp;
     cout << "Enter number of months: ";
     cin >> noOfMonths;
+
     srand(time(0));
-    computeWage(noOfEmp, noOfMonths);
+    computeWage(noOfEmp, noOfMonths, company);
+
     return 0;
 }
 
-void computeWage(int noOfEmp, int noOfMonths)
+void computeWage(int noOfEmp, int noOfMonths, Company company)
 {
+    cout << company.name << " " << company.wagePerHr << " " << company.workDaysPerMonth << " " << company.workHrsPerMonth;
     for (int empNo = 1; empNo <= noOfEmp; empNo++)
     {
         for (int month = 1; month <= noOfMonths; month++)
         {
             int workHrs = 0;
-            for (int day = 0; day < DAYS_IN_MONTH && workHrs < HRS_PER_MONTH; day++)
+            for (int day = 0; day < company.workDaysPerMonth && workHrs < company.workHrsPerMonth; day++)
             {
                 int result = rand() % 3;
                 switch (result)
@@ -46,8 +67,11 @@ void computeWage(int noOfEmp, int noOfMonths)
                     break;
                 }
             }
-            int totalWage = workHrs * WAGE_PER_HR;
-            writeToFile(to_string(empNo) + ", " + to_string(month) + ", " + to_string(totalWage));
+            int totalWage = workHrs * company.wagePerHr;
+            writeToFile(to_string(empNo) + ", " +
+                        company.name + ", " +
+                        to_string(month) + ", " +
+                        to_string(totalWage));
         }
     }
 }
