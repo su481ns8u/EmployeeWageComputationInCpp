@@ -6,7 +6,7 @@ using namespace std;
 
 typedef struct Company;
 void computeWage(int noOfEmp, int noOfMonths, Company company);
-void writeToFile(string data);
+void writeToFile(string fileName, string data);
 
 const int FULL_DAY_HRS = 8;
 const int PART_TIME_HRS = 4;
@@ -17,6 +17,15 @@ typedef struct Company
     int wagePerHr;
     int workDaysPerMonth;
     int workHrsPerMonth;
+    int totalEmpWage = 0;
+    string toString()
+    {
+        return this->name + ", " +
+               to_string(this->wagePerHr) + ", " +
+               to_string(this->workDaysPerMonth) + ", " +
+               to_string(this->workHrsPerMonth) + "," +
+               to_string(this->totalEmpWage);
+    }
 };
 
 int main(int argc, char const *argv[])
@@ -68,21 +77,23 @@ void computeWage(int noOfEmp, int noOfMonths, Company company)
                 }
             }
             int totalWage = workHrs * company.wagePerHr;
-            writeToFile(to_string(empNo) + ", " +
-                        company.name + ", " +
-                        to_string(month) + ", " +
-                        to_string(totalWage));
+            company.totalEmpWage += totalWage;
+            writeToFile("EmpWages.csv", "\n" + to_string(empNo) + ", " +
+                                            company.name + ", " +
+                                            to_string(month) + ", " +
+                                            to_string(totalWage));
         }
     }
+    writeToFile("Companies.csv", "\n" + company.toString());
 }
 
-void writeToFile(string data)
+void writeToFile(string fileName, string data)
 {
     fstream file;
-    file.open("EmpWages.csv", ios::app);
+    file.open(fileName, ios::app);
     if (file.is_open())
     {
-        file << data << endl;
+        file << data;
         file.close();
     }
     else
