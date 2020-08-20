@@ -1,0 +1,4 @@
+Wage: 1760
+Wage: 1520
+Wage: 1520
+Wage: 1760

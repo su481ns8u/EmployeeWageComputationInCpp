@@ -1,5 +1,6 @@
 #include <iostream>
 #include <time.h>
+#include <fstream>
 
 using namespace std;
 int FULL_DAY_HRS = 8;
@@ -8,6 +9,7 @@ int WAGE_PER_HR = 20;
 int DAYS_IN_MONTH = 20;
 int HRS_PER_MONTH = 100;
 int computeWage();
+void writeToFile(string data);
 
 int main(int argc, char const *argv[])
 {
@@ -35,5 +37,20 @@ int computeWage()
             break;
         }
     }
-    return workHrs * WAGE_PER_HR;
+    int totalWage = workHrs * WAGE_PER_HR;
+    writeToFile("Wage: " + to_string(totalWage));
+    return totalWage;
+}
+
+void writeToFile(string data)
+{
+    fstream file;
+    file.open("EmpWages.txt", ios::app);
+    if (file.is_open())
+    {
+        file << data << endl;
+        file.close();
+    }
+    else
+        cout << "error in opening file";
 }
