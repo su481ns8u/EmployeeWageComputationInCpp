@@ -2,6 +2,7 @@
 #include <time.h>
 #include <fstream>
 #include <list>
+#include <map>
 #include <iterator>
 
 using namespace std;
@@ -11,6 +12,7 @@ void computeWage(Company &company);
 void writeToFile(string fileName, string data);
 void empWageBuilder(Company company);
 void computeWageOfMultiple();
+void mapToFile(map<string, int> dailyWages, string company);
 
 const int FULL_DAY_HRS = 8;
 const int PART_TIME_HRS = 4;
@@ -94,28 +96,36 @@ void computeWageOfMultiple()
 
 void computeWage(Company &company)
 {
+    int totalWorkHrs;
     for (int empNo = 1; empNo <= company.noOfEmp; empNo++)
     {
         for (int month = 1; month <= company.noOfMonths; month++)
         {
             int workHrs = 0;
+            map<string, int> dailyWages;
             for (int day = 0; day < company.workDaysPerMonth && workHrs < company.workHrsPerMonth; day++)
             {
                 int result = rand() % 3;
                 switch (result)
                 {
                 case 1:
-                    workHrs += FULL_DAY_HRS;
+                    workHrs = FULL_DAY_HRS;
                     break;
                 case 2:
-                    workHrs += PART_TIME_HRS;
+                    workHrs = PART_TIME_HRS;
                     break;
                 default:
-                    workHrs += 0;
+                    workHrs = 0;
                     break;
                 }
+                dailyWages.insert(pair<string, int>("\nEmployee Wage for day" + to_string(day) +
+                                                        " of emp " + to_string(empNo) +
+                                                        " of month " + to_string(month) + " :",
+                                                    workHrs * company.wagePerHr));
+                totalWorkHrs += workHrs;
             }
-            int totalWage = workHrs * company.wagePerHr;
+            mapToFile(dailyWages, company.name);
+            int totalWage = totalWorkHrs * company.wagePerHr;
             company.totalEmpWage += totalWage;
             writeToFile("EmpWages.csv", "\n" + to_string(empNo) + ", " +
                                             company.name + ", " +
@@ -126,10 +136,18 @@ void computeWage(Company &company)
     writeToFile("Companies.csv", "\n" + company.toString());
 }
 
+void mapToFile(map<string, int> dailyWages, string company)
+{
+    map<string, int>::iterator dailyItr;
+    for (dailyItr = dailyWages.begin(); dailyItr != dailyWages.end(); dailyItr++)
+        writeToFile(company + ".txt", dailyItr->first + " " + to_string(dailyItr->second));
+    cout << "\nDaily wages for " + company + " are written to file successfully!";
+}
+
 void writeToFile(string fileName, string data)
 {
     fstream file;
-    file.open(fileName, ios::app);
+    file.open(fileName, ios::app | ios::out);
     if (file.is_open())
     {
         file << data;
