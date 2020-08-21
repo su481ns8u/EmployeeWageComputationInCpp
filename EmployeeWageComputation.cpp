@@ -1,6 +1,8 @@
 #include <iostream>
 #include <time.h>
 #include <fstream>
+#include <list>
+#include <iterator>
 
 using namespace std;
 
@@ -12,7 +14,6 @@ void computeWageOfMultiple();
 
 const int FULL_DAY_HRS = 8;
 const int PART_TIME_HRS = 4;
-int companyCounter = 0;
 
 typedef struct Company
 {
@@ -36,7 +37,7 @@ typedef struct Company
     }
 };
 
-Company companies[5];
+list<Company> companies;
 
 int main(int argc, char const *argv[])
 {
@@ -77,15 +78,16 @@ int main(int argc, char const *argv[])
 
 void empWageBuilder(Company company)
 {
-    companies[companyCounter++] = company;
+    companies.push_back(company);
 }
 
 void computeWageOfMultiple()
 {
-    for (int i = 0; i < companyCounter; i++)
+    list<Company>::iterator companyIterator;
+    for (companyIterator = companies.begin(); companyIterator != companies.end(); companyIterator++)
     {
         srand(time(0));
-        computeWage(companies[i]);
+        computeWage(*companyIterator);
     }
     cout << "Computed wages for companies and stored in files successfully!";
 }
