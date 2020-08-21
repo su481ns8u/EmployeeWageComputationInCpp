@@ -5,11 +5,14 @@
 using namespace std;
 
 typedef struct Company;
-void computeWage(int noOfEmp, int noOfMonths, Company company);
+void computeWage(Company &company);
 void writeToFile(string fileName, string data);
+void empWageBuilder(Company company);
+void computeWageOfMultiple();
 
 const int FULL_DAY_HRS = 8;
 const int PART_TIME_HRS = 4;
+int companyCounter = 0;
 
 typedef struct Company
 {
@@ -18,46 +21,80 @@ typedef struct Company
     int workDaysPerMonth;
     int workHrsPerMonth;
     int totalEmpWage = 0;
+    int noOfEmp;
+    int noOfMonths;
+
     string toString()
     {
         return this->name + ", " +
                to_string(this->wagePerHr) + ", " +
                to_string(this->workDaysPerMonth) + ", " +
                to_string(this->workHrsPerMonth) + "," +
-               to_string(this->totalEmpWage);
+               to_string(this->totalEmpWage) + ", " +
+               to_string(this->noOfEmp) + ", " +
+               to_string(this->noOfMonths);
     }
 };
+
+Company companies[5];
 
 int main(int argc, char const *argv[])
 {
     int noOfEmp, noOfMonths;
     Company company;
-
-    cout << "Enter name of company";
-    cin >> company.name;
-    cout << "Enter wage per hr for " << company.name << ": ";
-    cin >> company.wagePerHr;
-    cout << "Enter work days for " << company.name << ": ";
-    cin >> company.workDaysPerMonth;
-    cout << "Enter work hrs for " << company.name << ": ";
-    cin >> company.workHrsPerMonth;
-    cout << "Enter number of employees: ";
-    cin >> noOfEmp;
-    cout << "Enter number of months: ";
-    cin >> noOfMonths;
-
-    srand(time(0));
-    computeWage(noOfEmp, noOfMonths, company);
-
-    return 0;
+    int choice;
+    while (true)
+    {
+        cout << "Enter your choice: \n1. Add company\n2. Compute Wage\nChoice: ";
+        cin >> choice;
+        switch (choice)
+        {
+        case 1:
+            cout << "Enter name of company";
+            cin >> company.name;
+            cout << "Enter wage per hr for " << company.name << ": ";
+            cin >> company.wagePerHr;
+            cout << "Enter work days for " << company.name << ": ";
+            cin >> company.workDaysPerMonth;
+            cout << "Enter work hrs for " << company.name << ": ";
+            cin >> company.workHrsPerMonth;
+            cout << "Enter number of employees: ";
+            cin >> company.noOfEmp;
+            cout << "Enter number of months: ";
+            cin >> company.noOfMonths;
+            empWageBuilder(company);
+            break;
+        case 2:
+            computeWageOfMultiple();
+            return 0;
+            break;
+        default:
+            cout << "Invalid choice";
+            return 0;
+        }
+    }
 }
 
-void computeWage(int noOfEmp, int noOfMonths, Company company)
+void empWageBuilder(Company company)
 {
-    cout << company.name << " " << company.wagePerHr << " " << company.workDaysPerMonth << " " << company.workHrsPerMonth;
-    for (int empNo = 1; empNo <= noOfEmp; empNo++)
+    companies[companyCounter++] = company;
+}
+
+void computeWageOfMultiple()
+{
+    for (int i = 0; i < companyCounter; i++)
     {
-        for (int month = 1; month <= noOfMonths; month++)
+        srand(time(0));
+        computeWage(companies[i]);
+    }
+    cout << "Computed wages for companies and stored in files successfully!";
+}
+
+void computeWage(Company &company)
+{
+    for (int empNo = 1; empNo <= company.noOfEmp; empNo++)
+    {
+        for (int month = 1; month <= company.noOfMonths; month++)
         {
             int workHrs = 0;
             for (int day = 0; day < company.workDaysPerMonth && workHrs < company.workHrsPerMonth; day++)
