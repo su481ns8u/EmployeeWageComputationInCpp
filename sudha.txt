@@ -1,0 +1,16 @@
+
+Employee Wage for day0 of emp 1 of month 1 : 0
+Employee Wage for day1 of emp 1 of month 1 : 180
+Employee Wage for day2 of emp 1 of month 1 : 180
+Employee Wage for day3 of emp 1 of month 1 : 0
+Employee Wage for day4 of emp 1 of month 1 : 180
+Employee Wage for day0 of emp 1 of month 2 : 360
+Employee Wage for day1 of emp 1 of month 2 : 0
+Employee Wage for day2 of emp 1 of month 2 : 0
+Employee Wage for day3 of emp 1 of month 2 : 180
+Employee Wage for day4 of emp 1 of month 2 : 360
+Employee Wage for day0 of emp 1 of month 3 : 0
+Employee Wage for day1 of emp 1 of month 3 : 180
+Employee Wage for day2 of emp 1 of month 3 : 360
+Employee Wage for day3 of emp 1 of month 3 : 360
+Employee Wage for day4 of emp 1 of month 3 : 180

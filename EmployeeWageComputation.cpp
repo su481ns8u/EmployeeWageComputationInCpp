@@ -1,9 +1,11 @@
 #include <iostream>
 #include <time.h>
 #include <fstream>
+#include <sstream>
 #include <list>
 #include <map>
 #include <iterator>
+#include <vector>
 
 using namespace std;
 
@@ -13,6 +15,8 @@ void writeToFile(string fileName, string data);
 void empWageBuilder(Company company);
 void computeWageOfMultiple();
 void mapToFile(map<string, int> dailyWages, string company);
+list<Company> readFromFile(string fileName);
+void removeSpacesAndCommas(string &str);
 
 const int FULL_DAY_HRS = 8;
 const int PART_TIME_HRS = 4;
@@ -45,10 +49,11 @@ int main(int argc, char const *argv[])
 {
     int noOfEmp, noOfMonths;
     Company company;
+    list<Company> companyList;
     int choice;
     while (true)
     {
-        cout << "Enter your choice: \n1. Add company\n2. Compute Wage\nChoice: ";
+        cout << "Enter your choice: \n1. Add company\n2. Compute Wage\n3. Get Wage by company name\nChoice: ";
         cin >> choice;
         switch (choice)
         {
@@ -71,6 +76,20 @@ int main(int argc, char const *argv[])
             computeWageOfMultiple();
             return 0;
             break;
+        case 3:
+            companyList = readFromFile("Companies.csv");
+            if (companyList.size() == 0)
+                cout << "No companies added !";
+            else
+            {
+                string name;
+                cout << "Enter name of company: ";
+                cin >> name;
+                for (list<Company>::iterator itr = companyList.begin(); itr != companyList.end(); itr++)
+                    if (company.name == name)
+                        cout << "Total wage is " << company.totalEmpWage;
+            }
+            break;
         default:
             cout << "Invalid choice";
             return 0;
@@ -91,12 +110,12 @@ void computeWageOfMultiple()
         srand(time(0));
         computeWage(*companyIterator);
     }
-    cout << "Computed wages for companies and stored in files successfully!";
+    cout << "\nComputed wages for companies and stored in files successfully!";
 }
 
 void computeWage(Company &company)
 {
-    int totalWorkHrs;
+    int totalWorkHrs = 0;
     for (int empNo = 1; empNo <= company.noOfEmp; empNo++)
     {
         for (int month = 1; month <= company.noOfMonths; month++)
@@ -126,7 +145,9 @@ void computeWage(Company &company)
             }
             mapToFile(dailyWages, company.name);
             int totalWage = totalWorkHrs * company.wagePerHr;
-            company.totalEmpWage += totalWage;
+            cout << totalWage << endl;
+            company.totalEmpWage = totalWage;
+            cout << company.totalEmpWage;
             writeToFile("EmpWages.csv", "\n" + to_string(empNo) + ", " +
                                             company.name + ", " +
                                             to_string(month) + ", " +
@@ -141,7 +162,7 @@ void mapToFile(map<string, int> dailyWages, string company)
     map<string, int>::iterator dailyItr;
     for (dailyItr = dailyWages.begin(); dailyItr != dailyWages.end(); dailyItr++)
         writeToFile(company + ".txt", dailyItr->first + " " + to_string(dailyItr->second));
-    cout << "\nDaily wages for " + company + " are written to file successfully!";
+    cout << "\nDaily wages for " + company + " are written to file successfully!" << endl;
 }
 
 void writeToFile(string fileName, string data)
@@ -155,4 +176,58 @@ void writeToFile(string fileName, string data)
     }
     else
         cout << "error in opening file";
+}
+
+list<Company> readFromFile(string fileName)
+{
+    fstream file;
+    list<Company> companyList;
+    file.open(fileName, ios::in);
+    if (file.is_open())
+    {
+        vector<string> row;
+        string line, word, temp;
+        getline(file, line);
+        while (!file.eof())
+        {
+            getline(file, line);
+            stringstream s(line);
+            while (getline(s, word, ','))
+            {
+                removeSpacesAndCommas(word);
+                row.push_back(word);
+                if (row.size() > 0)
+                {
+                    Company company;
+                    company.name = row[0];
+                    company.wagePerHr = stoi(row[1]);
+                    company.workDaysPerMonth = stoi(row[2]);
+                    company.workHrsPerMonth = stoi(row[3]);
+                    company.totalEmpWage = stoi(row[4]);
+                    company.noOfEmp = stoi(row[5]);
+                    company.noOfMonths = stoi(row[6]);
+                    companyList.push_back(company);
+                }
+            }
+        }
+        return companyList;
+    }
+}
+
+void removeSpacesAndCommas(string &str)
+{
+    int j = 0;
+    for (int i = 0; i < str.length(); i++)
+    {
+        if (str[i] == ' ')
+        {
+            continue;
+        }
+        else
+        {
+            str[j] = str[i];
+            j++;
+        }
+    }
+    str[j] = '\0';
 }
