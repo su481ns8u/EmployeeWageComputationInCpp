@@ -49,7 +49,7 @@ int main(int argc, char const *argv[])
 {
     int noOfEmp, noOfMonths;
     Company company;
-    list<Company> companyList;
+    list<Company> companyList = readFromFile("Companies.csv");
     int choice;
     while (true)
     {
@@ -74,10 +74,8 @@ int main(int argc, char const *argv[])
             break;
         case 2:
             computeWageOfMultiple();
-            return 0;
             break;
         case 3:
-            companyList = readFromFile("Companies.csv");
             if (companyList.size() == 0)
                 cout << "No companies added !";
             else
@@ -88,6 +86,14 @@ int main(int argc, char const *argv[])
                 for (list<Company>::iterator itr = companyList.begin(); itr != companyList.end(); itr++)
                     if (company.name == name)
                         cout << "Total wage is " << company.totalEmpWage;
+            }
+            break;
+        case 4:
+            companyList.sort([](Company *lhs, Company *rhs) { return lhs->totalEmpWage < rhs->totalEmpWage; });
+            for (list<Company>::iterator itr = companyList.begin(); itr != companyList.end(); itr++)
+            {
+                Company company = *itr;
+                cout << company.toString();
             }
             break;
         default:
