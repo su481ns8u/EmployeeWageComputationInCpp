@@ -47,18 +47,33 @@ list<Company> companies;
 
 bool comparator(const vector<string> &arg1, const vector<string> &arg2)
 {
-    return arg1[3] < arg2[3];
+    return stoi(arg1[3]) < stoi(arg2[3]);
+}
+
+vector<vector<string>> listToVector(list<vector<string>> companyList)
+{
+    vector<vector<string>> companyVector(companyList.begin(), companyList.end());
+    return companyVector;
 }
 
 int main(int argc, char const *argv[])
 {
     int noOfEmp, noOfMonths;
     Company company;
+    string singleCompany;
     list<vector<string>> companyList;
+    vector<vector<string>> companyVector;
+    list<string> companyString;
+
     int choice;
     while (true)
     {
-        cout << "\nEnter your choice: \n1. Add company\n2. Compute Wage and exit\n3. Get Wage by company name\n4. Sort by monthly wage\nChoice: ";
+        cout << "\nEnter your choice: "
+             << "\n1. Add company"
+             << "\n2. Compute Wage and exit"
+             << "\n3. Get Wage by company name"
+             << "\n4. Sort by monthly wage"
+             << "\n5. Sort by daily wage\nChoice: ";
         cin >> choice;
         switch (choice)
         {
@@ -99,13 +114,27 @@ int main(int argc, char const *argv[])
             break;
         case 4:
             companyList = readFromFile("EmpWages.csv");
-            vector<vector<string>> companyVector(companyList.begin(), companyList.end());
-            list<string> companyString;
+            companyVector = listToVector(companyList);
             sort(companyVector.begin(), companyVector.end(), &comparator);
             for (vector<string> comp : companyVector)
                 companyString.push_back("\n" + comp[0] + "," + comp[1] + "," + comp[2] + "," + comp[3]);
             writeToFile("SortedEmpWages.csv", companyString, false);
+            companyString.clear();
             break;
+        case 5:
+            cout << "Enter name of Company to sort data by per day wages: ";
+            cin >> singleCompany;
+            companyList = readFromFile(singleCompany + ".csv");
+            companyVector = listToVector(companyList);
+            sort(companyVector.begin(), companyVector.end(), &comparator);
+            for (vector<string> comp : companyVector)
+                companyString.push_back("\n" + comp[0] + "," + comp[1] + "," + comp[2] + "," + comp[3]);
+            writeToFile(singleCompany + "Sorted.csv", companyString, true);
+            companyString.clear();
+            break;
+        default:
+            cout << "Invalid choice !!!";
+            return 0;
         }
     }
 }
