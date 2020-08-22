@@ -73,7 +73,9 @@ int main(int argc, char const *argv[])
              << "\n2. Compute Wage and exit"
              << "\n3. Get Wage by company name"
              << "\n4. Sort by monthly wage"
-             << "\n5. Sort by daily wage\nChoice: ";
+             << "\n5. Sort by daily wage"
+             << "\n6. Employees with wage per hr 50"
+             << "\nChoice: ";
         cin >> choice;
         switch (choice)
         {
@@ -130,6 +132,21 @@ int main(int argc, char const *argv[])
             for (vector<string> comp : companyVector)
                 companyString.push_back("\n" + comp[0] + "," + comp[1] + "," + comp[2] + "," + comp[3]);
             writeToFile(singleCompany + "Sorted.csv", companyString, true);
+            companyString.clear();
+            companyList.clear();
+            break;
+        case 6:
+            companyList = readFromFile("Companies.csv");
+            for (vector<string> obj : companyList)
+                if (stoi(obj[1]) == 50)
+                    companyString.push_back(obj[0]);
+            companyList.clear();
+            companyList = readFromFile("EmpWages.csv");
+            for (vector<string> obj : companyList)
+                for (string name : companyString)
+                    if (obj[1] == name)
+                        cout << "Company: " + name + " Employee: " + obj[0] << endl;
+            companyList.clear();
             companyString.clear();
             break;
         default:
@@ -243,8 +260,4 @@ list<vector<string>> readFromFile(string fileName)
         file.close();
         return compList;
     }
-}
-
-void sortByMonthlyWage()
-{
 }
