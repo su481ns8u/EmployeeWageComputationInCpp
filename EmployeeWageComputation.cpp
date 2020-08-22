@@ -6,16 +6,16 @@
 #include <map>
 #include <iterator>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
 typedef struct Company;
 void computeWage(Company &company);
-void writeToFile(string fileName, string data);
+void writeToFile(string fileName, list<string> &data, bool isCompFile);
 void empWageBuilder(Company company);
 void computeWageOfMultiple();
-void mapToFile(map<string, int> dailyWages, string company);
-list<Company> readFromFile(string fileName);
+list<vector<string>> readFromFile(string fileName);
 void removeSpacesAndCommas(string &str);
 
 const int FULL_DAY_HRS = 8;
@@ -33,27 +33,32 @@ typedef struct Company
 
     string toString()
     {
-        return this->name + ", " +
-               to_string(this->wagePerHr) + ", " +
-               to_string(this->workDaysPerMonth) + ", " +
+        return "\n" + this->name + "," +
+               to_string(this->wagePerHr) + "," +
+               to_string(this->workDaysPerMonth) + "," +
                to_string(this->workHrsPerMonth) + "," +
-               to_string(this->totalEmpWage) + ", " +
-               to_string(this->noOfEmp) + ", " +
+               to_string(this->totalEmpWage) + "," +
+               to_string(this->noOfEmp) + "," +
                to_string(this->noOfMonths);
     }
 };
 
 list<Company> companies;
 
+bool comparator(const vector<string> &arg1, const vector<string> &arg2)
+{
+    return arg1[3] < arg2[3];
+}
+
 int main(int argc, char const *argv[])
 {
     int noOfEmp, noOfMonths;
     Company company;
-    list<Company> companyList = readFromFile("Companies.csv");
+    list<vector<string>> companyList;
     int choice;
     while (true)
     {
-        cout << "Enter your choice: \n1. Add company\n2. Compute Wage\n3. Get Wage by company name\nChoice: ";
+        cout << "\nEnter your choice: \n1. Add company\n2. Compute Wage and exit\n3. Get Wage by company name\n4. Sort by monthly wage\nChoice: ";
         cin >> choice;
         switch (choice)
         {
@@ -74,31 +79,33 @@ int main(int argc, char const *argv[])
             break;
         case 2:
             computeWageOfMultiple();
+            return 0;
             break;
         case 3:
+            companyList = readFromFile("Companies.csv");
             if (companyList.size() == 0)
-                cout << "No companies added !";
+                cout << "\nNo companies added !";
             else
             {
                 string name;
                 cout << "Enter name of company: ";
                 cin >> name;
-                for (list<Company>::iterator itr = companyList.begin(); itr != companyList.end(); itr++)
-                    if (company.name == name)
-                        cout << "Total wage is " << company.totalEmpWage;
+                for (list<vector<string>>::iterator itr = companyList.begin(); itr != companyList.end(); itr++)
+                    if ((*itr)[0] == name)
+                        cout << "\nTotal wage is " << (*itr)[4];
             }
+            companyList.clear();
+            return 0;
             break;
         case 4:
-            companyList.sort([](Company *lhs, Company *rhs) { return lhs->totalEmpWage < rhs->totalEmpWage; });
-            for (list<Company>::iterator itr = companyList.begin(); itr != companyList.end(); itr++)
-            {
-                Company company = *itr;
-                cout << company.toString();
-            }
+            companyList = readFromFile("EmpWages.csv");
+            vector<vector<string>> companyVector(companyList.begin(), companyList.end());
+            list<string> companyString;
+            sort(companyVector.begin(), companyVector.end(), &comparator);
+            for (vector<string> comp : companyVector)
+                companyString.push_back("\n" + comp[0] + "," + comp[1] + "," + comp[2] + "," + comp[3]);
+            writeToFile("SortedEmpWages.csv", companyString, false);
             break;
-        default:
-            cout << "Invalid choice";
-            return 0;
         }
     }
 }
@@ -111,25 +118,31 @@ void empWageBuilder(Company company)
 void computeWageOfMultiple()
 {
     list<Company>::iterator companyIterator;
+    list<string> str;
     for (companyIterator = companies.begin(); companyIterator != companies.end(); companyIterator++)
     {
         srand(time(0));
         computeWage(*companyIterator);
+        str.push_back((*companyIterator).toString());
     }
+    writeToFile("Companies.csv", str, false);
     cout << "\nComputed wages for companies and stored in files successfully!";
 }
 
 void computeWage(Company &company)
 {
+    list<string> dailyWages;
+    list<string> monthlyWages;
     int totalWorkHrs = 0;
     for (int empNo = 1; empNo <= company.noOfEmp; empNo++)
     {
         for (int month = 1; month <= company.noOfMonths; month++)
         {
             int workHrs = 0;
-            map<string, int> dailyWages;
+            int monthlyWage = 0;
             for (int day = 0; day < company.workDaysPerMonth && workHrs < company.workHrsPerMonth; day++)
             {
+                int dailyWage = 0;
                 int result = rand() % 3;
                 switch (result)
                 {
@@ -143,97 +156,66 @@ void computeWage(Company &company)
                     workHrs = 0;
                     break;
                 }
-                dailyWages.insert(pair<string, int>("\nEmployee Wage for day" + to_string(day) +
-                                                        " of emp " + to_string(empNo) +
-                                                        " of month " + to_string(month) + " :",
-                                                    workHrs * company.wagePerHr));
-                totalWorkHrs += workHrs;
+                dailyWage = workHrs * company.wagePerHr;
+                monthlyWage += dailyWage;
+                dailyWages.push_back("\n" +
+                                     to_string(empNo) + "," +
+                                     to_string(month) + "," +
+                                     to_string(day) + "," +
+                                     to_string(dailyWage));
             }
-            mapToFile(dailyWages, company.name);
-            int totalWage = totalWorkHrs * company.wagePerHr;
-            cout << totalWage << endl;
-            company.totalEmpWage = totalWage;
-            cout << company.totalEmpWage;
-            writeToFile("EmpWages.csv", "\n" + to_string(empNo) + ", " +
-                                            company.name + ", " +
-                                            to_string(month) + ", " +
-                                            to_string(totalWage));
+            company.totalEmpWage += monthlyWage;
+            monthlyWages.push_back("\n" +
+                                   to_string(empNo) + "," +
+                                   company.name + "," +
+                                   to_string(month) + "," +
+                                   to_string(monthlyWage));
         }
     }
-    writeToFile("Companies.csv", "\n" + company.toString());
+    writeToFile(company.name + ".csv", dailyWages, true);
+    writeToFile("EmpWages.csv", monthlyWages, false);
 }
 
-void mapToFile(map<string, int> dailyWages, string company)
-{
-    map<string, int>::iterator dailyItr;
-    for (dailyItr = dailyWages.begin(); dailyItr != dailyWages.end(); dailyItr++)
-        writeToFile(company + ".txt", dailyItr->first + " " + to_string(dailyItr->second));
-    cout << "\nDaily wages for " + company + " are written to file successfully!" << endl;
-}
-
-void writeToFile(string fileName, string data)
+void writeToFile(string fileName, list<string> &data, bool isCompFile)
 {
     fstream file;
     file.open(fileName, ios::app | ios::out);
     if (file.is_open())
     {
-        file << data;
+        if (isCompFile)
+            file << "empNo,month,day,dailyWage";
+        list<string>::iterator itr;
+        for (itr = data.begin(); itr != data.end(); itr++)
+            file << *itr;
         file.close();
     }
     else
         cout << "error in opening file";
 }
 
-list<Company> readFromFile(string fileName)
+list<vector<string>> readFromFile(string fileName)
 {
     fstream file;
-    list<Company> companyList;
+    list<vector<string>> compList;
     file.open(fileName, ios::in);
     if (file.is_open())
     {
-        vector<string> row;
         string line, word, temp;
         getline(file, line);
         while (!file.eof())
         {
+            vector<string> row;
             getline(file, line);
             stringstream s(line);
             while (getline(s, word, ','))
-            {
-                removeSpacesAndCommas(word);
                 row.push_back(word);
-                if (row.size() > 0)
-                {
-                    Company company;
-                    company.name = row[0];
-                    company.wagePerHr = stoi(row[1]);
-                    company.workDaysPerMonth = stoi(row[2]);
-                    company.workHrsPerMonth = stoi(row[3]);
-                    company.totalEmpWage = stoi(row[4]);
-                    company.noOfEmp = stoi(row[5]);
-                    company.noOfMonths = stoi(row[6]);
-                    companyList.push_back(company);
-                }
-            }
+            compList.push_back(row);
         }
-        return companyList;
+        file.close();
+        return compList;
     }
 }
 
-void removeSpacesAndCommas(string &str)
+void sortByMonthlyWage()
 {
-    int j = 0;
-    for (int i = 0; i < str.length(); i++)
-    {
-        if (str[i] == ' ')
-        {
-            continue;
-        }
-        else
-        {
-            str[j] = str[i];
-            j++;
-        }
-    }
-    str[j] = '\0';
 }
