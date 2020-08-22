@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include <list>
-#include <map>
 #include <iterator>
 #include <vector>
 #include <algorithm>
@@ -17,6 +16,8 @@ void empWageBuilder(Company company);
 void computeWageOfMultiple();
 list<vector<string>> readFromFile(string fileName);
 void removeSpacesAndCommas(string &str);
+bool comparator(const vector<string> &arg1, const vector<string> &arg2);
+vector<vector<string>> listToVector(list<vector<string>> companyList);
 
 const int FULL_DAY_HRS = 8;
 const int PART_TIME_HRS = 4;
@@ -44,17 +45,6 @@ typedef struct Company
 };
 
 list<Company> companies;
-
-bool comparator(const vector<string> &arg1, const vector<string> &arg2)
-{
-    return stoi(arg1[3]) < stoi(arg2[3]);
-}
-
-vector<vector<string>> listToVector(list<vector<string>> companyList)
-{
-    vector<vector<string>> companyVector(companyList.begin(), companyList.end());
-    return companyVector;
-}
 
 int main(int argc, char const *argv[])
 {
@@ -154,6 +144,17 @@ int main(int argc, char const *argv[])
             return 0;
         }
     }
+}
+
+bool comparator(const vector<string> &arg1, const vector<string> &arg2)
+{
+    return stoi(arg1[3]) < stoi(arg2[3]);
+}
+
+vector<vector<string>> listToVector(list<vector<string>> companyList)
+{
+    vector<vector<string>> companyVector(companyList.begin(), companyList.end());
+    return companyVector;
 }
 
 void empWageBuilder(Company company)
